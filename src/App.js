@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 
+const ALL_NUMBERS = Array.from({ length: 37 }, (_, i) => i);
+
 function App() {
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState([]);
-  const [fullSequence, setFullSequence] = useState([]);
+  const [sequence, setSequence] = useState([]); // Visų įvestų skaičių seka
+  const [uniqueAgingList, setUniqueAgingList] = useState([]); // 18 seniausių unikalių skaičių
 
   const handleAddNumber = () => {
     const num = parseInt(input);
     if (isNaN(num) || num < 0 || num > 36) return;
 
-    setFullSequence((prev) => [...prev, num]);
+    setSequence((prev) => [...prev, num]);
 
-    setHistory((prev) => {
-      if (prev.includes(num)) return prev; // Neatnaujina, jei jau buvo
-      const updated = [...prev, num];
+    setUniqueAgingList((prev) => {
+      const filtered = prev.filter((n) => n !== num); // Išimti jei buvo anksčiau
+      const updated = [...filtered, num];
       return updated.length > 18 ? updated.slice(updated.length - 18) : updated;
     });
 
@@ -26,23 +28,13 @@ function App() {
     }
   };
 
-  const latest18 = history;
-  const oldest12 = history.slice(0, 12);
+  const oldest12 = uniqueAgingList.slice(0, 12);
 
-  // Papildoma funkcija: skaičiai, kurie buvo prieš daugiau nei 50 įrašų
-  const olderThan50 = () => {
-    const thresholdIndex = fullSequence.length - 50;
-    if (thresholdIndex <= 0) return [];
-
-    const seen = new Set(fullSequence.slice(thresholdIndex));
-    const result = {};
-    for (let i = 0; i < thresholdIndex; i++) {
-      const num = fullSequence[i];
-      if (!seen.has(num)) {
-        result[num] = (result[num] || 0) + 1;
-      }
-    }
-    return Object.entries(result);
+  // Apskaičiuoti skaičius, kurie nebuvo tarp paskutinių 50
+  const missingFromLast50 = () => {
+    const last50 = sequence.slice(-50);
+    const set50 = new Set(last50);
+    return ALL_NUMBERS.filter((num) => !set50.has(num));
   };
 
   return (
@@ -60,7 +52,7 @@ function App() {
 
       <div style={{ marginTop: "20px" }}>
         <h4>Seniausi 18 skaičių (unikalūs, senėjimo tvarka):</h4>
-        <div>{latest18.join(", ")}</div>
+        <div>{uniqueAgingList.join(", ")}</div>
       </div>
 
       <div style={{ marginTop: "20px" }}>
@@ -69,10 +61,10 @@ function App() {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <h4>Skaičiai, kurie iškrito seniau nei prieš 50 įrašų:</h4>
+        <h4>Skaičiai, kurie nebuvo tarp paskutinių 50 įrašų:</h4>
         <ul>
-          {olderThan50().map(([num, count]) => (
-            <li key={num}>Skaičius {num} iškrito {count} kartą(-us)</li>
+          {missingFromLast50().map((num) => (
+            <li key={num}>Skaičius {num}</li>
           ))}
         </ul>
       </div>
