@@ -6,10 +6,13 @@ function App() {
   const [input, setInput] = useState("");
   const [sequence, setSequence] = useState([]);
   const [lastSeen, setLastSeen] = useState({});
+  const [manualInputs, setManualInputs] = useState([]);
 
   const handleAddNumber = () => {
     const num = parseInt(input);
     if (isNaN(num) || num < 0 || num > 36) return;
+
+    setManualInputs((prev) => [...prev.slice(-4), num]);
 
     setSequence((prevSeq) => {
       const newSeq = [...prevSeq, num];
@@ -49,6 +52,17 @@ function App() {
     return ALL_NUMBERS.filter((n) => !set50.has(n));
   };
 
+  const getMissingFromLast65 = () => {
+    const last65 = sequence.slice(-65);
+    return new Set(ALL_NUMBERS.filter((n) => !last65.includes(n)));
+  };
+
+  const getLast5ManualInputs = () => {
+    return [...manualInputs].slice(-5).reverse();
+  };
+
+  const missingFrom65Set = getMissingFromLast65();
+
   return (
     <div style={{ fontSize: "140%", padding: "20px", fontFamily: "Arial" }}>
       <h2>Skaičių Sekimo Programėlė</h2>
@@ -67,6 +81,15 @@ function App() {
       </button>
 
       <div style={{ marginTop: "20px" }}>
+        <h3>5 paskutiniai įvesti į laukelį (paskutinis kairėje):</h3>
+        {manualInputs.length === 0 ? (
+          <p style={{ opacity: 0.6 }}>(Dar nieko neįvesta)</p>
+        ) : (
+          <p>{getLast5ManualInputs().join(", ")}</p>
+        )}
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
         <h3>Seniausi 18 skaičių:</h3>
         {getOldest18() ? (
           <p>{getOldest18().join(", ")}</p>
@@ -78,7 +101,20 @@ function App() {
       <div style={{ marginTop: "20px" }}>
         <h3>12 pačių seniausių:</h3>
         {getOldest12() ? (
-          <p>{getOldest12().join(", ")}</p>
+          <p>
+            {getOldest12().map((n, i) => (
+              <span
+                key={i}
+                style={{
+                  color: missingFrom65Set.has(n) ? "darkgreen" : "inherit",
+                  fontWeight: missingFrom65Set.has(n) ? "bold" : "normal",
+                  marginRight: "8px"
+                }}
+              >
+                {n}
+              </span>
+            ))}
+          </p>
         ) : (
           <p style={{ opacity: 0.6 }}>(Dar nepakanka duomenų)</p>
         )}
