@@ -27,19 +27,23 @@ function App() {
     }
   };
 
-  // Seniausi 18 skaičių
   const getOldest18 = () => {
+    const seenNumbers = Object.keys(lastSeen).map(Number);
+    if (seenNumbers.length < 19) return null;
+
     const neverSeen = ALL_NUMBERS.filter((n) => !(n in lastSeen));
-    const seen = ALL_NUMBERS.filter((n) => n in lastSeen)
-      .sort((a, b) => lastSeen[a] - lastSeen[b]);
+    const seen = seenNumbers.sort((a, b) => lastSeen[a] - lastSeen[b]);
     return [...neverSeen, ...seen].slice(0, 18);
   };
 
-  // 12 pačių seniausių iš jų
-  const getOldest12 = () => getOldest18().slice(0, 12);
+  const getOldest12 = () => {
+    const oldest18 = getOldest18();
+    if (!oldest18) return null;
+    return oldest18.slice(0, 12);
+  };
 
-  // Skaičiai, kurių nebuvo tarp paskutinių 50
   const getMissingFromLast50 = () => {
+    if (sequence.length < 50) return null;
     const last50 = sequence.slice(-50);
     const set50 = new Set(last50);
     return ALL_NUMBERS.filter((n) => !set50.has(n));
@@ -64,17 +68,29 @@ function App() {
 
       <div style={{ marginTop: "20px" }}>
         <h3>Seniausi 18 skaičių:</h3>
-        <p>{getOldest18().join(", ")}</p>
+        {getOldest18() ? (
+          <p>{getOldest18().join(", ")}</p>
+        ) : (
+          <p style={{ opacity: 0.6 }}>(Reikia bent 19 unikalių skaičių)</p>
+        )}
       </div>
 
       <div style={{ marginTop: "20px" }}>
         <h3>12 pačių seniausių:</h3>
-        <p>{getOldest12().join(", ")}</p>
+        {getOldest12() ? (
+          <p>{getOldest12().join(", ")}</p>
+        ) : (
+          <p style={{ opacity: 0.6 }}>(Dar nepakanka duomenų)</p>
+        )}
       </div>
 
       <div style={{ marginTop: "20px" }}>
         <h3>Skaičiai, kurių nebuvo tarp paskutinių 50:</h3>
-        <p>{getMissingFromLast50().join(", ")}</p>
+        {getMissingFromLast50() ? (
+          <p>{getMissingFromLast50().join(", ")}</p>
+        ) : (
+          <p style={{ opacity: 0.6 }}>(Dar neįvesta 50 skaičių)</p>
+        )}
       </div>
     </div>
   );
