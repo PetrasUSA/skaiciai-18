@@ -4,8 +4,8 @@ const ALL_NUMBERS = Array.from({ length: 37 }, (_, i) => i);
 
 function App() {
   const [input, setInput] = useState("");
-  const [sequence, setSequence] = useState([]); // Visų įvestų skaičių seka
-  const [uniqueAgingList, setUniqueAgingList] = useState([]); // 18 seniausių unikalių skaičių
+  const [sequence, setSequence] = useState([]);
+  const [uniqueAgingList, setUniqueAgingList] = useState([]);
 
   const handleAddNumber = () => {
     const num = parseInt(input);
@@ -14,7 +14,7 @@ function App() {
     setSequence((prev) => [...prev, num]);
 
     setUniqueAgingList((prev) => {
-      const filtered = prev.filter((n) => n !== num); // Išimti jei buvo anksčiau
+      const filtered = prev.filter((n) => n !== num);
       const updated = [...filtered, num];
       return updated.length > 18 ? updated.slice(updated.length - 18) : updated;
     });
@@ -30,7 +30,6 @@ function App() {
 
   const oldest12 = uniqueAgingList.slice(0, 12);
 
-  // Apskaičiuoti skaičius, kurie nebuvo tarp paskutinių 50
   const missingFromLast50 = () => {
     const last50 = sequence.slice(-50);
     const set50 = new Set(last50);
@@ -38,7 +37,7 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial", fontSize: "300%" }}>
       <h2>🎯 Skaičių Sekimo Programėlė</h2>
       <input
         type="number"
@@ -46,9 +45,9 @@ function App() {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        style={{ marginRight: "10px" }}
+        style={{ marginRight: "10px", fontSize: "100%" }}
       />
-      <button onClick={handleAddNumber}>Next</button>
+      <button onClick={handleAddNumber} style={{ fontSize: "100%" }}>Next</button>
 
       <div style={{ marginTop: "20px" }}>
         <h4>Seniausi 18 skaičių (unikalūs, senėjimo tvarka):</h4>
@@ -62,11 +61,11 @@ function App() {
 
       <div style={{ marginTop: "20px" }}>
         <h4>Skaičiai, kurie nebuvo tarp paskutinių 50 įrašų:</h4>
-        <ul>
+        <div>
           {missingFromLast50().map((num) => (
-            <li key={num}>Skaičius {num}</li>
+            <div key={num}>{num}</div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
